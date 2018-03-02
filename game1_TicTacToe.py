@@ -11,6 +11,7 @@ def clear(): #clear() leert die Konsolenansicht
 
 def Game_WinCheck(p,state): #überprüft nach einem Spielerzug ob der jeweilige Spieler gewonnen hat
             res = ''
+            game = True
             if state[0] == [p,p,p] or state[1] == [p,p,p] or state[2] == [p,p,p]:
                	game = False 
             elif(((state[0][0] == p and state[1][0] == p) and state[2][0] == p) or ((state[0][1] == p and state[1][1] == p) and state[1][2] == p) or ((state[2][0] == p and state[2][1] == p) and state[2][2] == p)):

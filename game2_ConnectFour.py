@@ -1,7 +1,7 @@
 import os
 import random
 
-def clear():
+def clear(): #Funktion zum leeren der Konsole wird mit draw() aufgewufen
     command = ''
     if os.name == 'nt':
         command = 'cls'
@@ -9,7 +9,7 @@ def clear():
         command = 'clear'
     os.system(command)
 
-def draw(state,pl):
+def draw(state): #gibt das Array state[][] grafisch wieder
     clear()
     print('\nConnect Four\n')
     screen = '|'
@@ -28,13 +28,13 @@ def draw(state,pl):
         screen = '|'
     print('|1|2|3|4|5|6|7|\n')
 
-def solo_or_vs(x):
+def solo_or_vs(x): #abfrage ob man alleine gegen den Computer oder gegen einen anderen Spieler spielt (defualt VS PC)
     if x == '2':
         return 1
     else:
         return 0
     
-def player_Turn(state,pl):
+def player_Turn(state,pl): 
     choice = 0
     turn = True
     i = 0
@@ -62,7 +62,7 @@ def player_Turn(state,pl):
         except ValueError:
             print('Dude!')
 
-def dumb_AI(state):
+def dumb_AI(state): #Computergegner der seine Steine zufällig plaziert solange in der Spalte noch ein Feld frei ist
     choice = random.randint(0,6)
     turn = True
     i = 0
@@ -75,19 +75,21 @@ def dumb_AI(state):
                 state[i-1][choice] = 2
                 return state
 
-def board_Full(state):
+def board_Full(state): #überprüft ob in der obersten Reihe state[0] noch leere Felder zur Verfügung stehen
     for i in range(len(state)):
         if state[i] == 0:
             return False
     return True
 
-def game_Win(state,pl):
+def game_Win(state,pl): #wenn sich 4 gleiche Steine in einer Reihe befinden wird ihr state zu 3, damit sich grafisch anzeigen lässt welche Steine für den Gewinn verantwortlich sind
+    
     #Horizontal
     for y in range(6):
         for x in range(4):
             if state[y][x:x+4] == [pl,pl,pl,pl]:
                 state[y][x:x+4] = [3,3,3,3]
                 return state
+            
     #Vertikal
     i = 0
     for x in range(7):
@@ -104,6 +106,7 @@ def game_Win(state,pl):
                             return state
 
     #Diagonal UL/OR
+                        
     j = 0
     for y in range(3):
         for x in range(4):
@@ -119,6 +122,7 @@ def game_Win(state,pl):
                             return state
 
     #Diagonal OL/UR
+                        
     k = 0
     l = 0
     for y in range(3):
@@ -129,10 +133,15 @@ def game_Win(state,pl):
                 if state[k-1][l-1] == pl:
                     if state[k-2][l-2] == pl:
                         if state[k-3][l-3] == pl:
+                            state[k][l] = 3
+                            state[k-1][l-1] = 3
+                            state[k-2][l-2] = 3
+                            state[k-3][l-3] = 3
                             return state
             
                         
     return state
+
 
 def play_Again():
     replay = input("Play again? (y/n) ")
@@ -140,6 +149,7 @@ def play_Again():
         game()
     else:
         print("Goodbye!")
+
 
 def game():
     state = [[0,0,0,0,0,0,0],
@@ -152,7 +162,7 @@ def game():
     player = random.randint(1,2)
     game = True
     AI = 0
-    draw(state,player)
+    draw(state)
     end = False
     AI = solo_or_vs(input("How many Players? (1 or 2): "))
     
@@ -160,7 +170,7 @@ def game():
     
     while game == True:
         
-        draw(state,player)
+        draw(state)
         
         if player == 1:
             state = player_Turn(state,player)
@@ -177,20 +187,24 @@ def game():
             player = 1
             
         if board_Full(state[0]) == True:
-            draw(state,player)
+            draw(state)
             print("\nIt's a draw!")
             game = False
         n = 0
-        for x in range(7):
+        for x in range(7): #hier wird überprüft ob sich in dem Array state[][] der Wert 3 finden lässt, 
             for y in range(6):
                 if state[y][x] == 3:
                     game = False
                     end = True
+                    if player == 1: #da vor der Gewinnabfrage schon der aktive Spieler gewechselt wird muss man dies hier wieder rückgängig machen um den richtigen Gewinner zu ermitteln
+                        player = 2
+                    else:
+                        player = 1
 
     if end == True:
-        draw(state,player)
+        draw(state)
         icon = ''
-        if player == 1:
+        if player == 1:  
             icon = 'O'
         else:
             icon = 'X'
