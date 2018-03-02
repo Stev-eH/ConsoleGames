@@ -1,7 +1,7 @@
 import os
-import random
+from random import randint 
 
-def clear(): 
+def clear(): #clear() leert die Konsolenansicht
     command = ''
     if os.name == 'nt':
         command = 'cls'
@@ -9,8 +9,8 @@ def clear():
         command = 'clear'
     os.system(command)
 
-def Game_WinCheck(p,state):
-            hm = ''            game = True
+def Game_WinCheck(p,state): #überprüft nach einem Spielerzug ob der jeweilige Spieler gewonnen hat
+            res = ''
             if state[0] == [p,p,p] or state[1] == [p,p,p] or state[2] == [p,p,p]:
                	game = False 
             elif(((state[0][0] == p and state[1][0] == p) and state[2][0] == p) or ((state[0][1] == p and state[1][1] == p) and state[1][2] == p) or ((state[2][0] == p and state[2][1] == p) and state[2][2] == p)):
@@ -19,27 +19,28 @@ def Game_WinCheck(p,state):
                 game = False
             if game == False:
                 if p == 1:
-                    hm = 'You win!'
+                    res = 'You win!'
                 else:
-                    hm = 'You lose!'
-            return hm 
+                    res = 'You lose!'
+            return res #gibt einen leeren String aus falls niemand gewonnen hat
 
-def Draw_Screen(state):
-            clear()  
+def Draw_Screen(state): #überprüft den aktuellen Zustand des Spielfelds und gibt ihn grafisch aus
+            clear()  #die clear() Funktion wurde hier mit eingebettet, damit die Konsole jedes mal geleert wird bevor das neue, aktuelle Spielfeld angezeigt wird
             print('\ntictactoe\n')
             screen = ''
             for y in range(3):
                 for x in range(3):
-                    if state[y][x] == 0:
+                    if state[y][x] == 0: 
                         screen += '. '
                     elif state[y][x] == 1:
                         screen += 'X '
                     else:
                         screen += 'O '
-                print(screen)
-                screen = ''
+                print(screen) #die Reihe wird nach der iteration von x ausgeben, damit für die nächste iteration von y eine neue Zeile "zur verfügung steht"
+                screen = '' 
 
-def player_Move(pl,turn,state):
+def player_Move(pl,turn,state): #wartet auf die Eingabe einer Zahl von 1-9, wenn das entsprechende Feld leer ist (state[?][?] == 0) wird dem Feld ein neuer Wert, je nach Speiler ,1 für X oder 2 für O zugewiesen)
+                                #im Anschluss wird state wieder ausgegeben
     while(turn == True):
         print('') 
         print('______\n1|2|3|\n4|5|6|\n7|8|9|\n------')
@@ -85,23 +86,23 @@ def player_Move(pl,turn,state):
         else:
             print('Invalid move!')
 
-def dumb_AI(state):
+def mock_AI(state): #Computer Gegner, plaziert zufällig
     taken = True
     while taken == True:
-        a = random.randint(0,2)
-        b = random.randint(0,2)
+        a = randint(0,2)
+        b = randint(0,2)
         if state[a][b] == 0:
             state[a][b] = 2
             return state
 
-def Game(mode = 0):
-    state= [[0,0,0],
+def Game(mode = 0): #Der eigentliche Spielablauf
+    state= [[0,0,0], #Das TicTacToe Feld wird als drei Dimensionales Array initialisiert
             [0,0,0],
             [0,0,0]] 
-    game = True
+    game = True 
     turn = True
-    player = random.randint(1,2)
-            
+    player = randint(1,2) #beginnender Spieler wird zufällig ausgewürfelt
+
     while(game == True):
         Draw_Screen(state)
         pl = player
@@ -112,15 +113,15 @@ def Game(mode = 0):
         if player == 1:
             state = player_Move(pl,turn,state)
         elif player == 2 and mode == 0:
-            state = dumb_AI(state)
+            state = mock_AI(state)
         else:
-            state = player_Move(pl,turn,state)
-        result = Game_WinCheck(player,state)    
-        if result != '':            
+            state = player_Move(pl,turn,state) 
+        result = Game_WinCheck(player,state) #wenn noch niemand gewonnen hat wird ein leerer String ausgegeben   
+        if result != '': #ist dieser String nicht leer wird nochmal abschließend das Feld aufgezeichnet, gefolgt von "You win" oder "You lose"           
             Draw_Screen(state)
             print('\n'+result)
             game = False
-        if player == 1:
+        if player == 1: #Spilerwechsel zwischen den Zügen
             player = 2
         else:
             player = 1 
@@ -129,10 +130,10 @@ def Game(mode = 0):
 
 ### Anfang #################################################################
 while True:
-    modd = input('Against COM (default) or another Player? (Enter 2)')
+    modd = input('Against COM (default) or another Player? (Enter 2) ')
     if modd == '2':
         Game(2)
     else:
-        Game()
+        Game(0)
         
         
