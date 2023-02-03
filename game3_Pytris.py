@@ -3,6 +3,13 @@ import time
 import os
 from enum import IntEnum
 
+####### EDITABLE OPTIONS #################################
+
+DEBUG_FUNC = 1 #Enables Debug Functionality if set to 1
+TIMER_DELAY = 0.2 #Sets the update freuquency
+
+##########################################################
+
 class Block:
     def __init__(self):
         self.isDropping = True
@@ -14,6 +21,7 @@ class State(IntEnum):
     FULLLINE = 3
     CLEAR_BLINK_ON = 4
     CLEAR_BLINK_OFF = 5
+    UPDATE_LOCK = 6
 
 
 FIELD = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
@@ -34,15 +42,13 @@ FIELD = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
          0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
          0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
          0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-         1, 0, 1, 0, 1, 0, 1, 0, 1, 0,
-         0, 1, 0, 1, 0, 1, 0, 1, 0, 1,
-         1, 0, 1, 0, 1, 0, 1, 0, 1, 0,
-         0, 1, 0, 1, 0, 1, 0, 1, 0, 1]
+         0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+         0, 0, 0, 0, 0, 0, 0, 1, 0, 0,
+         0, 0, 0, 0, 0, 0, 0, 1, 0, 0,
+         0, 0, 0, 0, 0, 0, 1, 1, 0, 0]
 
 X_DIM = 10
 Y_DIM = 22
-
-DEBUG_FUNC = 1 #Enables Debug Functionality if set to 1
 
 
 def draw():
@@ -80,23 +86,29 @@ def getIcon(icon):
 
 
 def stopAndWait():
-    time.sleep(0.2)
+    time.sleep(TIMER_DELAY)
 
 
 def updateFieldTest():
 
-    for piece in range(X_DIM * Y_DIM):
-        if(FIELD[piece] == 1):
-            if(piece - X_DIM < 0 or (FIELD[piece - X_DIM] != 0)):
-                FIELD[piece] = 2
+    pieceSet = False
 
+    for piece in range(X_DIM * Y_DIM):
+        if(FIELD[piece] == State.FALLING and pieceSet == False):
+            if(piece - X_DIM < 0 or (FIELD[piece - X_DIM] != State.EMPTY)):
+                pieceSet = True
             else:
-                FIELD[piece] = 0
-                FIELD[piece - X_DIM] = 3 #auf 3 setzen um updating zu unterbinden
+                FIELD[piece] = State.EMPTY
+                FIELD[piece - X_DIM] = State.UPDATE_LOCK #auf UPDATE_LOCK setzen um updating zu unterbinden
 
     for piece in range(X_DIM * Y_DIM):
-        if(FIELD[piece] == 3):
-            FIELD[piece] = 1
+        if(FIELD[piece] == State.UPDATE_LOCK):
+            FIELD[piece] = State.FALLING
+
+    if(pieceSet):
+        for piece in range(X_DIM * Y_DIM):
+            if(FIELD[piece] == State.FALLING):
+                FIELD[piece] = State.SET
 
 
 def updateFieldAfterLineClear(yCleared):
